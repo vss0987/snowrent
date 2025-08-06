@@ -1,0 +1,38 @@
+{% extends 'rent/base.html' %}
+
+{% block content %}
+<div class="container">
+    {% if category.slug == 'equipment' %}
+    <h1>Вся {{ category.name }}</h1>
+    {% else %}
+    <h1>Все {{ category.name }}</h1>
+    {% endif %}
+    {% for product in products %}
+    <div class="card mb-3">
+        <div class="row g-0">
+            {% if product.main_image %}
+            <div class="col-md-2">
+                <img src="{{ product.main_image.url }}"
+                     class="img-fluid p-1 rounded-start"
+                     alt="{{ product.name }}">
+            </div>
+            {% endif %}
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text">{{ product.description }}</p>
+                    <p class="card-text"><small class="text-muted">Цена: {{ product.price }} руб.</small></p>
+                    <a href="{% url 'rent:show_product' product.slug %}"
+                       class="btn btn-outline-primary rounded-pill px-3">
+                        Смотреть</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="alert alert-info">
+        Лыжи временно отсутствуют
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'rent/base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Основной товар -->
+    <div class="row align-items-start mb-5">
+        <div class="col-md-6 mb-4">
+            {% if product.main_image %}
+            <div class="text-center">
+                <img src="{{ product.main_image.url }}"
+                     class="img-fluid rounded"
+                     alt="{{ product.name }}"
+                     style="max-width: 300px; height: auto;">
+            </div>
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            <h1 class="mb-3">{{ product.name }}</h1>
+            <p class="text-muted mb-4">{{ product.category.name }}</p>
+
+            <div class="mb-4">
+                <span class="display-6 fw-bold">{{ product.price }} ₽</span>
+                <small class="text-muted">/ день</small>
+            </div>
+
+            <div class="mb-4 p-3 bg-light rounded">
+                <p class="mb-0">{{ product.description }}</p>
+            </div>
+
+            <div class="d-flex align-items-center mb-4">
+                <span class="badge bg-success me-2">
+                    <i class="bi bi-check-circle"></i> Доступно: {{ product.available_quantity }} шт.
+                </span>
+            </div>
+
+            {% if user.is_authenticated %}
+                <form method="post" action="{% url 'cart:add_to_cart' product.slug %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary btn-lg w-100 py-3" {% if product.available_quantity <= 0 %}disabled{% endif %}>
+                        <i class="bi bi-cart-plus"></i> Добавить в корзину
+                    </button>
+                </form>
+            {% else %}
+                <a href="{% url 'rent:login' %}" class="btn btn-primary btn-lg w-100 py-3">
+                    <i class="bi bi-box-arrow-in-right"></i> Войти для аренды
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Другие варианты в этой категории -->
+    <div class="related-products mt-5">
+        <h3 class="mb-4">Другие варианты в категории "{{ product.category.name }}"</h3>
+
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for related in related_products %}
+            <div class="col">
+                <div class="card h-100">
+                    {% if related.main_image %}
+                    <img src="{{ related.main_image.url }}"
+                         class="card-img-top p-3"
+                         alt="{{ related.name }}"
+                         style="max-height: 200px; width: auto; object-fit: contain;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ related.name }}</h5>
+                        <p class="card-text text-primary fw-bold">{{ related.price }} ₽</p>
+                        <p class="card-text small text-muted">
+                            Доступно: {{ related.available_quantity }} шт.
+                        </p>
+                    </div>
+                    <div class="card-footer bg-white border-top-0">
+                        <a href="{% url 'rent:show_product' related.slug %}"
+                           class="btn btn-outline-primary w-100">
+                            Подробнее
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">Другие товары в этой категории отсутствуют</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

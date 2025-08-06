@@ -1,0 +1,93 @@
+{% extends 'rent/base.html' %}
+
+{% block content %}
+<!-- Герой-секция -->
+<section class="hero-section text-white py-5">
+    <div class="container py-5 text-center">
+        <h1 class="display-4 fw-bold mb-4">Аренда снаряжения для зимнего спорта</h1>
+        <p class="lead mb-4">Лучшие лыжи, сноуборды и экипировка по выгодным ценам</p>
+        <a href="{% url 'rent:products' %}" class="btn btn-primary" class="btn btn-rent btn-lg px-4 py-2">Выбрать
+            сейчас</a>
+    </div>
+</section>
+
+<!-- Популярные товары -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">Популярное оборудование</h2>
+        <div class="row g-4">
+            {% for product in popular_products %}
+            <!-- Карточка товара -->
+            <div class="col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="ratio ratio-16x9">
+                        {% if product.main_image %}
+                        <img src="{{ product.main_image.url }}" class="img-fluid p-2"
+                             alt="{{ product.name }}"
+                             style="object-fit: contain;">
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name|truncatechars:20 }}</h5>
+                        <p class="text-muted">{{ product.description|truncatechars:30 }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-primary">{{ product.price }} руб./день</span>
+                            {% if user.is_authenticated %}
+                                <form action="{% url 'cart:add_to_cart' product.slug %}" method="post">
+                                    {% csrf_token %}
+                                    {% if product.available_quantity > 0 %}
+                                    <button type="submit" class="btn btn-sm btn-outline-primary"
+                                            {% if product.available_quantity <= 0 %}disabled{% endif %}>
+                                    Арендовать
+                                    </button>
+                                    {% else %}
+                                    <small class="text-danger d-block">Нет в наличии</small>
+                                    {% endif %}
+                                </form>
+                            {% else %}
+                                <a href="{% url 'rent:login' %}" class="btn btn-sm btn-outline-primary">
+                                    Войти для аренды
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'rent:products' %}" class="btn btn-primary">Смотреть весь каталог</a>
+        </div>
+    </div>
+</section>
+
+<!-- Преимущества -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Почему выбирают нас?</h2>
+        <div class="row g-4">
+            <div class="col-md-4 text-center">
+                <div class="bg-primary bg-opacity-10 p-4 rounded-3 h-100">
+                    <i class="bi bi-check-circle-fill text-primary fs-1 mb-3"></i>
+                    <h4>Качественное снаряжение</h4>
+                    <p>Только проверенные бренды и регулярное обслуживание</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="bg-primary bg-opacity-10 p-4 rounded-3 h-100">
+                    <i class="bi bi-currency-exchange text-primary fs-1 mb-3"></i>
+                    <h4>Гибкие цены</h4>
+                    <p>Скидки при долгосрочной аренде и для групп</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="bg-primary bg-opacity-10 p-4 rounded-3 h-100">
+                    <i class="bi bi-geo-alt-fill text-primary fs-1 mb-3"></i>
+                    <h4>Удобное расположение</h4>
+                    <p>Пункты выдачи у всех крупных горнолыжных курортов</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

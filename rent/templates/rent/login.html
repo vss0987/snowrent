@@ -1,0 +1,59 @@
+{% extends 'rent/base.html' %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="card shadow-sm p-4" style="width: 100%; max-width: 400px;">
+        <form method="post">
+            {% csrf_token %}
+            {% if next %}
+                <input type="hidden" name="next" value="{{ next }}">
+            {% endif %}
+
+            <h2 class="text-center mb-3 font-montserrat">Снова с нами?</h2>
+            <p class="text-center text-muted mb-4 font-opensans">Войдите в свой аккаунт</p>
+
+            {% if form.errors %}
+                <div class="alert alert-danger font-opensans">
+                    Неверное имя пользователя или пароль
+                </div>
+            {% endif %}
+
+            <div class="mb-3">
+                <input type="text" name="username" class="form-control form-control-lg font-opensans"
+                       placeholder="Ваш логин или email" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" name="password" class="form-control form-control-lg font-opensans"
+                       placeholder="Ваш пароль" required>
+            </div>
+            <div class="d-grid gap-2 mb-3">
+                <button type="submit" class="btn btn-primary btn-lg py-2 font-montserrat">
+                    Продолжить
+                </button>
+            </div>
+            <div class="text-center">
+                <p class="mb-0 font-opensans">Впервые у нас?
+                    <a href="{% url 'rent:registration' %}?next={{ next|default:request.path }}"
+                       class="text-primary fw-bold">Завести аккаунт</a>
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .font-montserrat {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 600;
+    }
+    .font-opensans {
+        font-family: 'Open Sans', sans-serif;
+    }
+    .card {
+        border-radius: 12px;
+    }
+    .btn-lg {
+        border-radius: 8px;
+    }
+</style>
+{% endblock %}

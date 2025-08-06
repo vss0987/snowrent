@@ -1,0 +1,72 @@
+/* Переменные цветов */
+:root {
+  --primary: #3498db;
+  --secondary: #2c3e50;
+  --accent: #e74c3c;
+  --light: #ecf0f1;
+  --dark: #2c3e50;
+}
+
+/* Основные стили */
+body {
+  font-family: 'Open Sans', sans-serif;
+  color: var(--dark);
+}
+
+h1, h2, h3, h4, h5, .navbar-brand {
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Герой-секция */
+.hero-section {
+  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("/static/rent/img/001.jpeg");
+  background-size: cover;
+  background-position: center;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+}
+
+/* Кнопка аренды */
+.btn-rent {
+  background-color: var(--accent);
+  color: white;
+  border: none;
+  transition: all 0.3s;
+}
+
+.btn-rent:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Карточки товаров */
+.card {
+  transition: transform 0.3s, box-shadow 0.3s;
+  border: none;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
+
+/* Преимущества */
+.bg-primary-opacity-10 {
+  background-color: rgba(52, 152, 219, 0.1);
+}
+
+/* Футер */
+footer a {
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+footer a:hover {
+  color: var(--accent) !important;
+}

@@ -1,0 +1,56 @@
+{% extends 'rent/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5 my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <!-- Анимированная иконка -->
+            <div class="mb-4">
+                <i class="bi bi-exclamation-triangle-fill text-warning" style="font-size: 5rem;"></i>
+            </div>
+            
+            <h1 class="display-4 fw-bold mb-4">404 - Страница не найдена</h1>
+            
+            <p class="lead mb-5">Похоже, вы свернули не на ту лыжню! Запрошенная страница отсутствует на нашем сервере.</p>
+            
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <a href="{% url 'rent:home' %}" class="btn btn-primary btn-lg px-4">
+                    <i class="bi bi-house-door"></i> На главную
+                </a>
+                <a href="{% url 'rent:products' %}" class="btn btn-outline-primary btn-lg px-4">
+                    <i class="bi bi-snow"></i> В каталог
+                </a>
+                {% if not user.is_authenticated %}
+                <a href="{% url 'rent:login' %}" class="btn btn-light btn-lg px-4">
+                    <i class="bi bi-box-arrow-in-right"></i> Войти
+                </a>
+                {% endif %}
+            </div>
+            
+            <!-- Декоративный элемент -->
+            <div class="mt-5 pt-4">
+                <img src="{% static 'rent/img/001.png' %}" alt="Лыжи" class="img-fluid" style="max-height: 150px;">
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Анимация для иконки */
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    
+    .bi-exclamation-triangle-fill {
+        animation: shake 2s ease infinite;
+    }
+    
+    /* Дополнительные стили для страницы 404 */
+    body {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}

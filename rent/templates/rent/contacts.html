@@ -1,0 +1,89 @@
+{% extends 'rent/base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">Контакты</h1>
+    
+    <div class="row">
+        <!-- Основная контактная информация -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="card-title h4 mb-4">Как с нами связаться</h2>
+                    
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <i class="bi bi-telephone me-2"></i>
+                            <strong>Телефон:</strong> 
+                            <a href="tel:{{ phone }}">{{ phone }}</a>
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-envelope me-2"></i>
+                            <strong>Email:</strong> 
+                            <a href="mailto:{{ email }}">{{ email }}</a>
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            <strong>Адрес:</strong> {{ address }}
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-clock me-2"></i>
+                            <strong>Часы работы:</strong> {{ work_hours }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Форма обратной связи -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="card-title h4 mb-4">Обратная связь</h2>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Ваше имя</label>
+                            <input type="text" class="form-control" id="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Сообщение</label>
+                            <textarea class="form-control" id="message" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Отправить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Социальные сети -->
+    <div class="mt-4">
+        <h2 class="h4 mb-3">Мы в соцсетях</h2>
+        <div class="d-flex gap-3">
+            <a href="#" class="btn btn-outline-primary">
+                <i class="bi bi-vimeo"></i> ВКонтакте
+            </a>
+            <a href="#" class="btn btn-outline-primary">
+                <i class="bi bi-telegram"></i> Telegram
+            </a>
+            <a href="#" class="btn btn-outline-primary">
+                <i class="bi bi-whatsapp"></i> WhatsApp
+            </a>
+        </div>
+    </div>
+    
+    <!-- Карта (можно использовать Яндекс.Карты или Google Maps) -->
+    <div class="mt-5">
+        <h2 class="h4 mb-3">Как нас найти</h2>
+        <div class="ratio ratio-16x9">
+            <iframe src="https://yandex.ru/map-widget/v1/?um=constructor%3A1a2b3c4d5e6f7g8h9i0j&amp;source=constructor" 
+                    frameborder="0"></iframe>
+        </div>
+    </div>
+</div>
+{% endblock %}
