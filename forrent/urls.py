@@ -1,3 +1,12 @@
+"""
+Корневые URL-маршруты проекта.
+
+Маршруты:
+- /admin/ - админ-панель
+- /cart/ - корзина (пространство имен 'cart')
+- / - основное приложение rent (пространство имен 'rent')
+"""
+
 from django.contrib import admin
 from django.urls import path, include
 

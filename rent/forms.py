@@ -1,12 +1,21 @@
+"""
+Формы для валидации пользовательского ввода.
+
+Формы:
+- RegistrationForm: регистрация пользователя
+- LoginForm: авторизация
+- OrderForm: оформление заказа (только комментарий)
+"""
+
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-
 from rent.models import Order
 
 
 class RegistrationForm(UserCreationForm):
-    email = forms.EmailField(required=False)  # Установите required=False для поля e-mail
+    """Регистрация нового пользователя. Email не обязателен."""
+    email = forms.EmailField(required=False)
 
     class Meta:
         model = User
@@ -14,6 +23,7 @@ class RegistrationForm(UserCreationForm):
 
 
 class LoginForm(forms.Form):
+    """Авторизация пользователя."""
     username = forms.CharField(
         label='Имя пользователя',
         widget=forms.TextInput(attrs={'class': 'form-control'})
@@ -25,6 +35,7 @@ class LoginForm(forms.Form):
 
 
 class OrderForm(forms.ModelForm):
+    """Оформление заказа (только комментарий)."""
     class Meta:
         model = Order
         fields = ['comment']

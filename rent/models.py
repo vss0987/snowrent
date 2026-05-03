@@ -1,3 +1,13 @@
+"""
+Модели данных для приложения rent.
+
+Содержит модели для:
+- Товаров и категорий (Product, Category)
+- Корзины покупок (Cart, CartItem)
+- Заказов (Order, OrderItem)
+- Контактной информации (ContactInfo)
+"""
+
 from datetime import timedelta
 
 from django.contrib.auth.models import User
@@ -8,67 +18,9 @@ from django.urls import reverse
 from django.utils import timezone
 
 
-class Product(models.Model):
-    CATEGORY_CHOICES = [
-        ('ski', 'Лыжи'),
-        ('snowboard', 'Сноуборд'),
-        ('helmet', 'Шлем'),
-        ('ski_bindings', 'Горнолыжные крепления'),
-        ('equipment', 'Экипировка'),
-    ]
-    name = models.CharField(max_length=255, verbose_name="Товар")
-    slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="Slug")
-    description = models.TextField(blank=True, verbose_name="Описание")
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена")
-    category = models.ForeignKey('Category', on_delete=models.PROTECT,
-                                 db_index=True, related_name='products', verbose_name="Категория")
-    total_quantity  = models.PositiveIntegerField(default=0, verbose_name="Общее количество")
-    reserved_quantity = models.PositiveIntegerField(default=0, verbose_name="Зарезервировано")
-    main_image = models.ImageField(
-        upload_to="products/%Y/%m/%d/",
-        blank=True,
-        null=True,
-        verbose_name="Главное изображение"
-    )
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Добавлено")
-    updated_at = models.DateTimeField(auto_now=True, verbose_name="Редактировано")
-    is_available = models.BooleanField(default=True, db_index=True, verbose_name="Наличие товара")
-
-    def __str__(self):
-        return self.name
-
-    def save(self, *args, **kwargs):
-        # Гарантируем, что reserved_quantity не превышает total_quantity
-        self.reserved_quantity = min(self.reserved_quantity, self.total_quantity)
-        # Гарантируем, что reserved_quantity не отрицательное
-        self.reserved_quantity = max(0, self.reserved_quantity)
-        super().save(*args, **kwargs)
-
-    def get_absolute_url(self):
-        return reverse('rent:product_detail', kwargs={'slug': self.slug})
-
-    def release_reserved(self, amount):
-        """Безопасное уменьшение зарезервированного количества"""
-        self.reserved_quantity = max(0, self.reserved_quantity - amount)
-        self.save()
-
-    def reserve(self, amount):
-        """Безопасное увеличение зарезервированного количества"""
-        self.reserved_quantity += amount
-        self.save()
-
-    @property
-    def available_quantity(self):
-        """Реальное доступное количество (total - reserved)"""
-        return max(0, self.total_quantity - self.reserved_quantity)
-
-    class Meta:
-        verbose_name = "Товар"
-        verbose_name_plural = "Товары"
-        ordering = ['-created_at']
-
-
 class Category(models.Model):
+    """Категория товаров (Лыжи, Сноуборды, Экипировка)."""
+
     name = models.CharField(max_length=255, db_index=True, verbose_name="Название")
     slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="Slug")
     is_available = models.BooleanField(default=True, db_index=True, verbose_name="Наличие категории")
@@ -83,20 +35,77 @@ class Category(models.Model):
         return self.products.filter(is_available=True).count()
 
     def get_models_count_text(self):
+        """Возвращает строку с правильным склонением слова 'модель'."""
         count = self.products.filter(is_available=True).count()
         if count % 10 == 1 and count % 100 != 11:
             return f"{count} модель"
         elif 2 <= count % 10 <= 4 and (count % 100 < 10 or count % 100 >= 20):
             return f"{count} модели"
-        else:
-            return f"{count} моделей"
+        return f"{count} моделей"
 
     class Meta:
         verbose_name = "Категория"
         verbose_name_plural = "Категории"
 
 
+class Product(models.Model):
+    """Товар для аренды (лыжи, сноуборды, экипировка)."""
+
+    name = models.CharField(max_length=255, verbose_name="Товар")
+    slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="Slug")
+    description = models.TextField(blank=True, verbose_name="Описание")
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена")
+    category = models.ForeignKey(
+        Category, on_delete=models.PROTECT,
+        related_name='products', verbose_name="Категория"
+    )
+    total_quantity = models.PositiveIntegerField(default=0, verbose_name="Общее количество")
+    reserved_quantity = models.PositiveIntegerField(default=0, verbose_name="Зарезервировано")
+    main_image = models.ImageField(
+        upload_to="products/%Y/%m/%d/",
+        blank=True, null=True,
+        verbose_name="Главное изображение"
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Добавлено")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Редактировано")
+    is_available = models.BooleanField(default=True, db_index=True, verbose_name="Наличие товара")
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        # Защита от некорректных значений reserved_quantity
+        self.reserved_quantity = min(self.reserved_quantity, self.total_quantity)
+        self.reserved_quantity = max(0, self.reserved_quantity)
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('rent:product_detail', kwargs={'slug': self.slug})
+
+    def release_reserved(self, amount):
+        """Освободить указанное количество из резерва."""
+        self.reserved_quantity = max(0, self.reserved_quantity - amount)
+        self.save()
+
+    def reserve(self, amount):
+        """Зарезервировать указанное количество."""
+        self.reserved_quantity += amount
+        self.save()
+
+    @property
+    def available_quantity(self):
+        """Доступное количество (общее - зарезервированное)."""
+        return max(0, self.total_quantity - self.reserved_quantity)
+
+    class Meta:
+        verbose_name = "Товар"
+        verbose_name_plural = "Товары"
+        ordering = ['-created_at']
+
+
 class Cart(models.Model):
+    """Корзина покупок пользователя (живет 15 минут)."""
+
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Пользователь")
     session_key = models.CharField(max_length=40, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создано")
@@ -109,7 +118,7 @@ class Cart(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Корзина {self.user.username if self.user else self.session_key} (до {self.expires_at})"
+        return f"Корзина {self.user.username} (до {self.expires_at})"
 
     def total_price(self):
         return sum(item.total_price() for item in self.items.all())
@@ -120,6 +129,8 @@ class Cart(models.Model):
 
 
 class CartItem(models.Model):
+    """Позиция в корзине (связь Cart и Product)."""
+
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items', verbose_name="Корзина")
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name="Товар")
     quantity = models.PositiveIntegerField(default=0, verbose_name="Количество")
@@ -132,42 +143,41 @@ class CartItem(models.Model):
         return self.product.price * self.quantity
 
     def save(self, *args, **kwargs):
-        if not self.pk:  # Новый объект
+        # Обновляем резерв товара
+        if not self.pk:  # Новая позиция
             self.product.reserved_quantity += self.quantity
-        else:
-            # Получаем старую версию объекта из базы
+        else:  # Изменение количества
             old_item = CartItem.objects.get(pk=self.pk)
             diff = self.quantity - old_item.quantity
             self.product.reserved_quantity += diff
 
-        # Гарантируем, что reserved_quantity не станет отрицательным
         self.product.reserved_quantity = max(0, self.product.reserved_quantity)
         self.product.save()
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        self.product.reserved_quantity -= self.quantity
-        # Гарантируем, что reserved_quantity не станет отрицательным
-        self.product.reserved_quantity = max(0, self.product.reserved_quantity)
+        # Освобождаем резерв при удалении
+        self.product.reserved_quantity = max(0, self.product.reserved_quantity - self.quantity)
         self.product.save()
         super().delete(*args, **kwargs)
 
     class Meta:
         verbose_name = "Элемент корзины"
         verbose_name_plural = "Элементы корзины"
-        unique_together = ('cart', 'product')  # Чтобы товар не повторялся в корзине
+        unique_together = ('cart', 'product')
 
 
 @receiver(pre_delete, sender=Cart)
 def release_reserved(sender, instance, **kwargs):
+    """При удалении корзины освобождаем все резервы товаров."""
     for item in instance.items.all():
-        product = item.product
-        product.reserved -= item.quantity
-        product.save()
-
+        item.product.reserved_quantity = max(0, item.product.reserved_quantity - item.quantity)
+        item.product.save()
 
 
 class ContactInfo(models.Model):
+    """Контактная информация компании (одна запись)."""
+
     phone = models.CharField('Телефон', max_length=20)
     email = models.EmailField('Email')
     address = models.TextField('Адрес')
@@ -186,6 +196,8 @@ class ContactInfo(models.Model):
 
 
 class Order(models.Model):
+    """Заказ пользователя."""
+
     STATUS_CHOICES = [
         ('new', 'Новый'),
         ('processing', 'В обработке'),
@@ -208,9 +220,12 @@ class Order(models.Model):
     def __str__(self):
         return f"Заказ #{self.id}"
 
+
 class OrderItem(models.Model):
+    """Позиция в заказе (сохраняет цену на момент покупки)."""
+
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
-    product = models.ForeignKey('Product', on_delete=models.PROTECT)
+    product = models.ForeignKey(Product, on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
 

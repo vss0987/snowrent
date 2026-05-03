@@ -1,7 +1,14 @@
+"""
+Конфигурация приложения rent.
+
+Определяет мета-информацию и настройки приложения.
+"""
+
 from django.apps import AppConfig
 
 
 class RentConfig(AppConfig):
-    verbose_name = 'Категрии и товары'
+    """Конфигурация приложения rent."""
+    verbose_name = 'Категории и товары'  # Исправлено с "Категрии"
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'rent'

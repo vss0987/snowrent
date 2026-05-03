@@ -1,16 +1,10 @@
 """
-ASGI config for 123 project.
-
-It exposes the ASGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/5.2/howto/deployment/asgi/
+ASGI config for forrent project.
 """
 
 import os
-
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', '123.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'forrent.settings')
 
 application = get_asgi_application()
